@@ -2,223 +2,124 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aprende Python - Variables y Constantes</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Loader de Monaco Editor -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min/vs/loader.min.js"></script>
+    <title>Curso de Python: Variables y Constantes (30 Ejercicios)</title>
     <style>
-        body { background-color: #0f172a; color: #f8fafc; }
+        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 900px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; }
+        select { width: 100%; padding: 10px; font-size: 16px; margin-bottom: 20px; border-radius: 5px; border: 1px solid #ccc; }
+        .instruction { background: #e8f4fd; padding: 15px; border-left: 5px solid #3498db; margin-bottom: 20px; border-radius: 4px; }
+        textarea { width: 100%; height: 200px; font-family: monospace; font-size: 14px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+        button { background: #27ae60; color: white; border: none; padding: 12px 20px; font-size: 16px; cursor: pointer; border-radius: 5px; margin-top: 10px; }
+        button:hover { background: #219653; }
+        .output-box { margin-top: 20px; background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; font-family: monospace; white-space: pre-wrap; }
+        .ai-box { margin-top: 15px; background: #fff3cd; color: #856404; padding: 15px; border-radius: 5px; border: 1px solid #ffeeba; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col font-sans">
+<body>
+<div class="container">
+    <h1>🐍 Práctica: Variables y Constantes (30 Ejercicios)</h1>
+    
+    <label for="selector"><strong>Selecciona un ejercicio:</strong></label>
+    <select id="selector" onchange="cargarEjercicio()"></select>
 
-    <!-- Header -->
-    <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center shadow-md">
-        <div class="flex items-center space-x-3">
-            <span class="bg-blue-600 text-white font-bold p-2 rounded-lg text-lg">🐍</span>
-            <div>
-                <h1 class="text-xl font-bold tracking-wide">Plataforma Interactiva Python</h1>
-                <p class="text-xs text-slate-400">Ejercicios Variables y Constantes</p>
-            </div>
-        </div>
-        <div class="text-sm bg-slate-700 px-3 py-1.5 rounded-full text-slate-300 border border-slate-600">
-            Nivel: Principiante Absoluto
-        </div>
-    </header>
+    <div class="instruction" id="enunciado">Selecciona un ejercicio arriba para comenzar.</div>
 
-    <!-- Main Container -->
-    <div class="flex flex-1 overflow-hidden">
-        
-        <!-- Sidebar de Ejercicios -->
-        <aside class="w-80 bg-slate-900 border-r border-slate-800 flex flex-col">
-            <div class="p-4 border-b border-slate-800 font-semibold text-slate-200 bg-slate-900/50">
-                Lista de Ejercicios (30)
-            </div>
-            <div id="lista-ejercicios" class="flex-1 overflow-y-auto divide-y divide-slate-800/60">
-                <!-- Se llena dinámicamente -->
-            </div>
-        </aside>
+    <textarea id="editor"></textarea>
+    <br>
+    <button onclick="ejecutarCodigo()">Ejecutar Código</button>
 
-        <!-- Área de Trabajo Principal -->
-        <main class="flex-1 flex flex-col bg-slate-950 overflow-hidden">
-            
-            <!-- Descripción del Ejercicio -->
-            <section class="p-6 bg-slate-900/40 border-b border-slate-800 flex flex-col justify-between">
-                <div>
-                    <span id="badge-ejercicio" class="text-xs font-semibold bg-blue-500/20 text-blue-400 px-2.5 py-1 rounded-md border border-blue-500/30">Ejercicio 1</span>
-                    <h2 id="titulo-ejercicio" class="text-lg font-bold text-slate-100 mt-2">Cargando...</h2>
-                    <p id="desc-ejercicio" class="text-sm text-slate-300 mt-1 leading-relaxed">Cargando descripción...</p>
-                </div>
-            </section>
+    <h3>Consola:</h3>
+    <div class="output-box" id="salida">(Esperando ejecución...)</div>
 
-            <!-- Editor de Código y Consola (Split) -->
-            <div class="flex-1 flex flex-col lg:flex-row overflow-hidden">
-                
-                <!-- Monaco Editor Wrapper -->
-                <div class="flex-1 flex flex-col border-r border-slate-800">
-                    <div class="bg-slate-900 px-4 py-2 text-xs font-semibold text-slate-400 border-b border-slate-800 flex justify-between items-center">
-                        <span>Editor de Código (Python)</span>
-                        <button onclick="reiniciarCodigo()" class="text-slate-400 hover:text-white transition">Restaurar plantilla</button>
-                    </div>
-                    <div id="editor-container" class="flex-1"></div>
-                    <div class="p-4 bg-slate-900 border-t border-slate-800 flex justify-end">
-                        <button onclick="ejecutarCodigo()" id="btn-ejecutar" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold px-6 py-2.5 rounded-lg shadow-lg transition flex items-center space-x-2">
-                            <span>▶ Ejecutar Código</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Consola de Resultados y Tutor IA -->
-                <div class="w-full lg:w-96 bg-slate-900 flex flex-col border-t lg:border-t-0 border-slate-800">
-                    <div class="bg-slate-800/80 px-4 py-2 text-xs font-semibold text-slate-400 border-b border-slate-800">
-                        Consola y Tutor IA
-                    </div>
-                    <div class="flex-1 p-4 overflow-y-auto space-y-4 font-mono text-sm">
-                        <!-- Salida Consola -->
-                        <div>
-                            <span class="text-xs text-slate-500 block mb-1">Salida de la consola:</span>
-                            <pre id="consola-salida" class="bg-slate-950 p-3 rounded-lg text-slate-300 border border-slate-800 min-h-[80px] whitespace-pre-wrap">(Esperando ejecución...)</pre>
-                        </div>
-                        <!-- Tutor IA -->
-                        <div id="tutor-container" class="hidden">
-                            <span class="text-xs text-blue-400 block mb-1 font-sans font-semibold">🤖 Tutor IA:</span>
-                            <div id="tutor-mensaje" class="bg-blue-950/40 border border-blue-900/50 p-3 rounded-lg text-blue-200 text-xs font-sans leading-relaxed"></div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-        </main>
-
+    <div id="contenedor-ia" style="display:none;">
+        <h3>🤖 Tutor IA:</h3>
+        <div class="ai-box" id="explicacion-ia"></div>
     </div>
+</div>
 
-    <!-- Script de configuración y lógica -->
-    <script>
-        const ejercicios = [
-            { id: 1, titulo: "Tu primera variable", desc: "Crea una variable llamada 'mensaje' que almacene el texto \"¡Hola, Mundo!\" y muéstrala en la consola usando print().", codigo: "# Escribe tu código aquí abajo:\nmensaje = \"¡Hola, Mundo!\"\nprint(mensaje)" },
-            { id: 2, titulo: "Crear una variable de texto", desc: "Crea una variable llamada 'nombre' con tu nombre entre comillas e imprímela.", codigo: "# Escribe tu código aquí abajo:\nnombre = \"Carlos\"\nprint(nombre)" },
-            { id: 3, titulo: "Variable numérica", desc: "Declara una variable 'edad' con un número entero y muéstrala en consola.", codigo: "# Escribe tu código aquí abajo:\nedad = 20\nprint(edad)" },
-            { id: 4, titulo: "Suma de variables", desc: "Crea dos variables a = 10 y b = 20, súmalas en una tercera variable 'suma' e imprímela.", codigo: "# Escribe tu código aquí abajo:\na = 10\nb = 20\nsuma = a + b\nprint(suma)" },
-            { id: 5, titulo: "Tipos de datos (float)", desc: "Crea una variable de tipo decimal (float) llamada 'precio' con valor 19.99 e imprímela.", codigo: "# Escribe tu código aquí abajo:\nprecio = 19.99\nprint(precio)" },
-            { id: 6, titulo: "Variables booleanas", desc: "Crea una variable booleana llamada 'activo' con valor True y muéstrala.", codigo: "# Escribe tu código aquí abajo:\nactivo = True\nprint(activo)" },
-            { id: 7, titulo: "Reasignación de valor", desc: "Crea una variable 'puntos' con valor 50, luego asígnale 100 y muestra el resultado final.", codigo: "# Escribe tu código aquí abajo:\npuntos = 50\npuntos = 100\nprint(puntos)" },
-            { id: 8, titulo: "Constantes por convención", desc: "Crea una constante llamada 'PI' con valor 3.1416 y muéstrala en pantalla.", codigo: "# Escribe tu código aquí abajo:\nPI = 3.1416\nprint(PI)" },
-            { id: 9, titulo: "Operaciones con variables de texto", desc: "Crea 'saludo' = \"Hola\" y 'nombre' = \"Ana\". Únelas con un espacio y printéalas.", codigo: "# Escribe tu código aquí abajo:\nsaludo = \"Hola\"\nnombre = \"Ana\"\nprint(saludo + \" \" + nombre)" },
-            { id: 10, titulo: "Intercambio de valores", desc: "Intercambia los valores de x = 5 y y = 10 usando asignación múltiple (x, y = y, x) e imprime ambos.", codigo: "# Escribe tu código aquí abajo:\nx = 5\ny = 10\nx, y = y, x\nprint(x, y)" },
-            { id: 11, titulo: "Cálculo de Área", desc: "Define base = 5 y altura = 10. Calcula el área de un triángulo (base * altura / 2) y guárdala en una variable.", codigo: "# Escribe tu código aquí abajo:\nbase = 5\naltura = 10\narea = (base * altura) / 2\nprint(area)" },
-            { id: 12, titulo: "Concatenación y números", desc: "Crea una variable 'edad' con un número. Concatena texto convirtiéndola con str() (ej: \"Tengo \" + str(edad)).", codigo: "# Escribe tu código aquí abajo:\nedad = 22\nprint(\"Tengo \" + str(edad) + \" años\")" },
-            { id: 13, titulo: "Incremento acumulativo", desc: "Crea 'vidas' = 3. Reste 1 vida usando operador de asignación (-= 1) e imprímela.", codigo: "# Escribe tu código aquí abajo:\nvidas = 3\nvidas -= 1\nprint(vidas)" },
-            { id: 14, titulo: "Constante de configuración", desc: "Define una constante 'MAX_INTENTOS = 5' e imprímela junto a un texto descriptivo.", codigo: "# Escribe tu código aquí abajo:\nMAX_INTENTOS = 5\nprint(\"Intentos permitidos:\", MAX_INTENTOS)" },
-            { id: 15, titulo: "Cálculo de propina", desc: "Crea subtotal = 50.0 y porcentaje_propina = 0.15. Calcula la propina total e imprímela.", codigo: "# Escribe tu código aquí abajo:\nsubtotal = 50.0\nporcentaje_propina = 0.15\npropina = subtotal * porcentaje_propina\nprint(propina)" },
-            { id: 16, titulo: "Promedio de notas", desc: "Crea tres variables con calificaciones (nota1, nota2, nota3), saca su promedio y muéstralo.", codigo: "# Escribe tu código aquí abajo:\nnota1 = 14\nnota2 = 18\nnota3 = 16\npromedio = (nota1 + nota2 + nota3) / 3\nprint(promedio)" },
-            { id: 17, titulo: "Conversión de unidades", desc: "Crea una variable con grados Celsius = 25. Conviértela a Fahrenheit usando la fórmula F = C * 9/5 + 32.", codigo: "# Escribe tu código aquí abajo:\ncelsius = 25\nfahrenheit = celsius * 9/5 + 32\nprint(fahrenheit)" },
-            { id: 18, titulo: "Variables múltiples en una línea", desc: "Asigna en una sola línea x, y, z = 1, 2, 3 e imprime la suma de las tres.", codigo: "# Escribe tu código aquí abajo:\nx, y, z = 1, 2, 3\nprint(x + y + z)" },
-            { id: 19, titulo: "Uso de f-strings", desc: "Crea nombre = \"Luis\" y edad = 30. Imprime usando una f-string: f\"Hola, soy {nombre} y tengo {edad} años.\"", codigo: "# Escribe tu código aquí abajo:\nnombre = \"Luis\"\nedad = 30\nprint(f\"Hola, soy {nombre} y tengo {edad} años.\")" },
-            { id: 20, titulo: "Cálculo de descuento", desc: "Precio original = 200, descuento = 0.20 (20%). Calcula el precio final e imprímilo.", codigo: "# Escribe tu código aquí abajo:\nprecio = 200\ndescuento = 0.20\nprecio_final = precio - (precio * descuento)\nprint(precio_final)" },
-            { id: 21, titulo: "Constante de gravedad", desc: "Define GRAVEDAD = 9.81 y masa = 10. Calcula el peso (masa * GRAVEDAD) e imprímelo.", codigo: "# Escribe tu código aquí abajo:\nGRAVEDAD = 9.81\nmasa = 10\npeso = masa * GRAVEDAD\nprint(peso)" },
-            { id: 22, titulo: "Tipo de dato (type)", desc: "Crea una variable booleana o numérica y usa print(type(mi_variable)) para ver su tipo.", codigo: "# Escribe tu código aquí abajo:\nvalor = 42\nprint(type(valor))" },
-            { id: 23, titulo: "Operador módulo (%)", desc: "Crea numero = 17 y divisor = 3. Halla el residuo usando el operador % e imprímelo.", codigo: "# Escribe tu código aquí abajo:\nnumero = 17\ndivisor = 3\nresiduo = numero % divisor\nprint(residuo)" },
-            { id: 24, titulo: "Potencia con variables", desc: "Crea base = 2 y exponente = 3. Calcula la potencia usando ** e imprímela.", codigo: "# Escribe tu código aquí abajo:\nbase = 2\nexponente = 3\nresultado = base ** exponente\nprint(resultado)" },
-            { id: 25, titulo: "Cálculo de segundos en un día", desc: "Define constantes HORA_A_MIN = 60 y MIN_A_SEG = 60. Calcula cuántos segundos hay en un día (24 horas).", codigo: "# Escribe tu código aquí abajo:\nHORA_A_MIN = 60\nMIN_A_SEG = 60\nsegundos_dia = 24 * HORA_A_MIN * MIN_A_SEG\nprint(segundos_dia)" },
-            { id: 26, titulo: "Constantes de IVA", desc: "Define IVA = 0.12 y producto = 100. Calcula el valor total con IVA incluido.", codigo: "# Escribe tu código aquí abajo:\nIVA = 0.12\nproducto = 100\ntotal = producto + (producto * IVA)\nprint(total)" },
-            { id: 27, titulo: "Asignación combinada (*=)", desc: "Crea puntaje = 10. Multiplícalo por 5 usando el operador *= e imprime el resultado.", codigo: "# Escribe tu código aquí abajo:\npuntaje = 10\npuntaje *= 5\nprint(puntaje)" },
-            { id: 28, titulo: "Variables de texto múltiple", desc: "Crea un nombre y apellido por separado, combínalos con formato capitalizado o en una sola frase.", codigo: "# Escribe tu código aquí abajo:\nnombre = \"maria\"\napellido = \"gomez\"\nprint(nombre.capitalize() + \" \" + apellido.capitalize())" },
-            { id: 29, titulo: "Validación lógica con variables", desc: "Crea es_mayor_edad = True y tiene_permiso = False. Evalúa si ambas son verdaderas con 'and' y muéstralo.", codigo: "# Escribe tu código aquí abajo:\nes_mayor_edad = True\ntiene_permiso = False\nresultado = es_mayor_edad and tiene_permiso\nprint(resultado)" },
-            { id: 30, titulo: "Proyecto final: Factura", desc: "Define variables para producto, cantidad, precio unitario y calcula el total a pagar imprimiendo un resumen.", codigo: "# Escribe tu código aquí abajo:\nproducto = \"Laptop\"\ncantidad = 2\nprecio_unitario = 450.0\ntotal_pagar = cantidad * precio_unitario\nprint(f\"Producto: {producto} | Total: ${total_pagar}\")" }
-        ];
+<script>
+const ejercicios = [
+    {titulo: "1. Declarar una variable numérica", desc: "Crea una variable llamada 'edad' y asígnale el valor 25. Luego imprímela.", codigo: "# Escribe tu código aquí abajo:\nedad = 25\nprint(edad)"},
+    {titulo: "2. Variable de tipo texto (String)", desc: "Crea una variable llamada 'nombre' con tu nombre e imprímela.", codigo: "# Escribe tu código aquí abajo:\nnombre = \"Carlos\"\nprint(nombre)"},
+    {titulo: "3. Actualizar el valor de una variable", desc: "Crea una variable 'puntos' con valor 10, súmale 5 e imprime el resultado final.", codigo: "# Escribe tu código aquí abajo:\npuntos = 10\npuntos = puntos + 5\nprint(puntos)"},
+    {titulo: "4. Constante por convención", desc: "Crea una constante llamada 'PI' con valor 3.1416 e imprímela.", codigo: "# Escribe tu código aquí abajo:\nPI = 3.1416\nprint(PI)"},
+    {titulo: "5. Suma de dos variables", desc: "Crea dos variables numéricas 'a = 12' y 'b = 8', súmalas e imprime el resultado.", codigo: "# Escribe tu código aquí abajo:\na = 12\nb = 8\nprint(a + b)"},
+    {titulo: "6. Asignación múltiple", desc: "Asigna en una sola línea x = 5, y = 10 e imprime la suma de ambos.", codigo: "# Escribe tu código aquí abajo:\nx, y = 5, 10\nprint(x + y)"},
+    {titulo: "7. Constante de configuración de velocidad", desc: "Crea una constante 'MAX_VELOCIDAD = 120' y muéstrala en pantalla.", codigo: "# Escribe tu código aquí abajo:\nMAX_VELOCIDAD = 120\nprint(MAX_VELOCIDAD)"},
+    {titulo: "8. Concatenación de texto", desc: "Crea 'saludo = \"Hola\"' y 'persona = \"Ana\"'. Imprímelos unidos con un espacio.", codigo: "# Escribe tu código aquí abajo:\nsaludo = \"Hola\"\npersona = \"Ana\"\nprint(saludo + \" \" + persona)"},
+    {titulo: "9. Variable booleana", desc: "Crea una variable 'es_activo' con valor True e imprímela.", codigo: "# Escribe tu código aquí abajo:\nes_activo = True\nprint(es_activo)"},
+    {titulo: "10. Cálculo de área de un rectángulo", desc: "Define constantes 'BASE = 10' y 'ALTURA = 5'. Calcula e imprime el área.", codigo: "# Escribe tu código aquí abajo:\nBASE = 10\nALTURA = 5\narea = BASE * ALTURA\nprint(area)"},
+    {titulo: "11. Tipo de dato con type()", desc: "Crea una variable 'precio = 19.99' e imprime su tipo usando type(precio).", codigo: "# Escribe tu código aquí abajo:\nprecio = 19.99\nprint(type(precio))"},
+    {titulo: "12. Intercambio de valores (Swapping)", desc: "Dado a = 1 y b = 2, intercambia sus valores e imprime 'a' y 'b'.", codigo: "# Escribe tu código aquí abajo:\na = 1\nb = 2\na, b = b, a\nprint(a)\nprint(b)"},
+    {titulo: "13. Uso de f-strings básico", desc: "Crea 'producto = \"Laptop\"' y 'precio = 800'. Imprime: 'El precio de la Laptop es 800'.", codigo: "# Escribe tu código aquí abajo:\nproducto = \"Laptop\"\nprecio = 800\nprint(f\"El precio de la {producto} es {precio}\")"},
+    {titulo: "14. Constante de días de la semana", desc: "Crea una constante 'DIAS_SEMANA = 7' y multiplícala por 4 para obtener semanas.", codigo: "# Escribe tu código aquí abajo:\nDIAS_SEMANA = 7\nprint(DIAS_SEMANA * 4)"},
+    {titulo: "15. Conversión de texto a entero (Casting)", desc: "Crea una variable texto 'numero_str = \"50\"', conviértela a int y súmale 10.", codigo: "# Escribe tu código aquí abajo:\nnumero_str = \"50\"\nresultado = int(numero_str) + 10\nprint(resultado)"},
+    {titulo: "16. Variables decimales (Float)", desc: "Crea 'temperatura = 23.5' y réstale 2.0. Imprime el resultado.", codigo: "# Escribe tu código aquí abajo:\ntemperatura = 23.5\ntemperatura = temperatura - 2.0\nprint(temperatura)"},
+    {titulo: "17. Constante de IVA", desc: "Crea una constante 'IVA = 0.16' y calcula el impuesto de un producto que cuesta 200.", codigo: "# Escribe tu código aquí abajo:\nIVA = 0.16\nprecio = 200\nprint(precio * IVA)"},
+    {titulo: "18. Operador módulo con variables", desc: "Crea 'numero = 17' y usa el operador % 2 para ver su residuo.", codigo: "# Escribe tu código aquí abajo:\nnumero = 17\nprint(numero % 2)"},
+    {titulo: "19. Longitud de un string almacenado", desc: "Crea una variable 'palabra = \"Programacion\"' e imprime su longitud con len().", codigo: "# Escribe tu código aquí abajo:\npalabra = \"Programacion\"\nprint(len(palabra))"},
+    {titulo: "20. Nombre completo uniendo variables", desc: "Crea 'nombre = \"Lucía\"', 'apellido = \"Gómez\"' e imprímelos juntos formateados.", codigo: "# Escribe tu código aquí abajo:\nnombre = \"Lucía\"\napellido = \"Gómez\"\nprint(f\"{nombre} {apellido}\")"},
+    {titulo: "21. Constante de segundos en una hora", desc: "Define constantes 'MINUTOS_HORA = 60' y 'SEGUNDOS_MINUTO = 60'. Imprime cuántos segundos tiene una hora.", codigo: "# Escribe tu código aquí abajo:\nMINUTOS_HORA = 60\nSEGUNDOS_MINUTO = 60\nprint(MINUTOS_HORA * SEGUNDOS_MINUTO)"},
+    {titulo: "22. Reasignación con operador abreviado", desc: "Crea 'saldo = 100' y asígnale saldo += 50 usando el operador abreviado. Imprímelo.", codigo: "# Escribe tu código aquí abajo:\nsaldo = 100\nsaldo += 50\nprint(saldo)"},
+    {titulo: "23. Variables nulas o None", desc: "Crea una variable 'resultado_busqueda = None' e imprímela.", codigo: "# Escribe tu código aquí abajo:\nresultado_busqueda = None\nprint(resultado_busqueda)"},
+    {titulo: "24. Conversión a string", desc: "Crea una variable numérica 'anio = 2026', conviértela a texto y concaténala con un mensaje.", codigo: "# Escribe tu código aquí abajo:\nanio = 2026\nprint(\"Estamos en el año \" + str(anio))"},
+    {titulo: "25. Constante de gravedad", desc: "Crea una constante 'GRAVEDAD = 9.8' y calcula el peso de un objeto de masa 10 (Fuerza = masa * gravedad).", codigo: "# Escribe tu código aquí abajo:\nGRAVEDAD = 9.8\nmasa = 10\nprint(masa * GRAVEDAD)"},
+    {titulo: "26. Potenciación con variables", desc: "Crea una variable 'base = 2' y elevala al cubo (**) usando variables. Imprime el resultado.", codigo: "# Escribe tu código aquí abajo:\nbase = 2\nprint(base ** 3)"},
+    {titulo: "27. Dividir y obtener entero (Floor Division)", desc: "Crea 'total_manzanas = 13' y divídelas entre 4 personas usando división entera (//). Imprime cuántas le toca a cada uno.", codigo: "# Escribe tu código aquí abajo:\ntotal_manzanas = 13\nprint(total_manzanas // 4)"},
+    {titulo: "28. Constante de nombre de aplicación", desc: "Define una constante 'APP_NOMBRE = \"MiSistemaPython\"' y 'APP_VERSION = 1.0'. Imprímelos juntos.", codigo: "# Escribe tu código aquí abajo:\nAPP_NOMBRE = \"MiSistemaPython\"\nAPP_VERSION = 1.0\nprint(f\"{APP_NOMBRE} v{APP_VERSION}\")"},
+    {titulo: "29. Conversión de mayúsculas en string", desc: "Crea una variable 'curso = \"python básico\"' y usa el método .upper() para imprimirla.", codigo: "# Escribe tu código aquí abajo:\ncurso = \"python básico\"\nprint(curso.upper())"},
+    {titulo: "30. Cálculo de promedio final", desc: "Crea tres variables con calificaciones: 'n1 = 85', 'n2 = 90', 'n3 = 95'. Calcula e imprime su promedio.", codigo: "# Escribe tu código aquí abajo:\nn1 = 85\nn2 = 90\nn3 = 95\npromedio = (n1 + n2 + n3) / 3\nprint(promedio)"}
+];
 
-        let ejercicioActual = 1;
-        let editor = null;
+function inicializar() {
+    const selector = document.getElementById('selector');
+    ejercicios.forEach((ej, index) => {
+        let opt = document.createElement('option');
+        opt.value = index;
+        opt.textContent = ej.titulo;
+        selector.appendChild(opt);
+    });
+    cargarEjercicio();
+}
 
-        require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.0/min' }});
-        require(['vs/editor/editor.main'], function() {
-            editor = monaco.editor.create(document.getElementById('editor-container'), {
-                value: ejercicios[0].codigo,
-                language: 'python',
-                theme: 'vs-dark',
-                automaticLayout: true,
-                fontSize: 14,
-                minimap: { enabled: false }
-            });
-            renderizarLista();
-            cargarEjercicioInicial();
+function cargarEjercicio() {
+    const idx = document.getElementById('selector').value;
+    document.getElementById('enunciado').innerHTML = `<strong>Enunciado:</strong> ${ejercicios[idx].desc}`;
+    document.getElementById('editor').value = ejercicios[idx].codigo;
+    document.getElementById('salida').innerText = "(Esperando ejecución...)";
+    document.getElementById('contenedor-ia').style.display = "none";
+}
+
+async function ejecutarCodigo() {
+    const codigo = document.getElementById('editor').value;
+    const salidaDiv = document.getElementById('salida');
+    const iaDiv = document.getElementById('explicacion-ia');
+    const contenedorIa = document.getElementById('contenedor-ia');
+
+    salidaDiv.innerText = "Ejecutando...";
+    contenedorIa.style.display = "none";
+
+    try {
+        const response = await fetch('/ejecutar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ codigo: codigo })
         });
+        const data = await response.json();
 
-        function cargarEjercicioInicial() {
-            const ex = ejercicios[0];
-            document.getElementById('badge-ejercicio').innerText = `Ejercicio ${ex.id}`;
-            document.getElementById('titulo-ejercicio').innerText = ex.titulo;
-            document.getElementById('desc-ejercicio').innerText = ex.desc;
+        salidaDiv.innerText = data.salida;
+
+        if (data.explicacion_ia) {
+            iaDiv.innerText = data.explicacion_ia;
+            contenedorIa.style.display = "block";
         }
+    } catch (err) {
+        salidaDiv.innerText = "Error de red al conectar con el servidor.";
+    }
+}
 
-        function renderizarLista() {
-            const contenedor = document.getElementById('lista-ejercicios');
-            contenedor.innerHTML = '';
-            ejercicios.forEach(ex => {
-                const btn = document.createElement('button');
-                btn.className = `w-full text-left p-3.5 text-xs transition flex items-center space-x-3 ${ex.id === ejercicioActual ? 'bg-blue-600/20 text-blue-400 font-semibold border-l-4 border-blue-500' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'}`;
-                btn.innerHTML = `<span class="text-slate-500 font-mono">#${ex.id}</span> <span class="truncate">${ex.titulo}</span>`;
-                btn.onclick = () => cambiarEjercicio(ex.id);
-                contenedor.appendChild(btn);
-            });
-        }
-
-        function cambiarEjercicio(id) {
-            ejercicioActual = id;
-            const ex = ejercicios.find(e => e.id === id);
-            document.getElementById('badge-ejercicio').innerText = `Ejercicio ${ex.id}`;
-            document.getElementById('titulo-ejercicio').innerText = ex.titulo;
-            document.getElementById('desc-ejercicio').innerText = ex.desc;
-            editor.setValue(ex.codigo);
-            document.getElementById('consola-salida').innerText = '(Esperando ejecución...)';
-            document.getElementById('tutor-container').classList.add('hidden');
-            renderizarLista();
-        }
-
-        function reiniciarCodigo() {
-            const ex = ejercicios.find(e => e.id === ejercicioActual);
-            editor.setValue(ex.codigo);
-        }
-
-        async function ejecutarCodigo() {
-            const codigo = editor.getValue();
-            const btn = document.getElementById('btn-ejecutar');
-            const consola = document.getElementById('consola-salida');
-            const tutorCont = document.getElementById('tutor-container');
-            const tutorMsg = document.getElementById('tutor-mensaje');
-
-            btn.disabled = true;
-            btn.innerText = "Ejecutando...";
-            consola.innerText = "Procesando...";
-            tutorCont.classList.add('hidden');
-
-            try {
-                const response = await fetch('/ejecutar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ codigo })
-                });
-                const data = await response.json();
-
-                consola.innerText = data.salida || "(Sin salida)";
-                
-                if (data.explicacion_ia) {
-                    tutorMsg.innerText = data.explicacion_ia;
-                    tutorCont.classList.remove('hidden');
-                } else if (data.mensaje) {
-                    tutorMsg.innerText = data.mensaje;
-                    tutorCont.classList.remove('hidden');
-                }
-            } catch (err) {
-                consola.innerText = "Error de conexión con el servidor.";
-            } finally {
-                btn.disabled = false;
-                btn.innerText = "▶ Ejecutar Código";
-            }
-        }
-    </script>
+window.onload = inicializar;
+</script>
 </body>
 </html>

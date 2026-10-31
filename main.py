@@ -55,6 +55,7 @@ def ejecutar_codigo(req: CodigoRequest):
     codigo_limpio = sanitizar_codigo(req.codigo)
     codigo_alumno = extraer_codigo_alumno(codigo_limpio)
 
+    # 1. CASO: EL ALUMNO NO HA ESCRITO NADA DEBAJO DEL COMENTARIO GUÍA
     if not codigo_alumno:
         return {
             "exito": False,
@@ -81,8 +82,10 @@ def ejecutar_codigo(req: CodigoRequest):
 
     salida_consola = buffer_salida.getvalue().strip()
 
+    # 2. CASO: ERROR DE SINTAXIS O EJECUCIÓN
     if error_ocurrido:
         explicacion = "Ocurrió un error al ejecutar tu código."
+
         if ai_client:
             prompt = (
                 f"Eres un tutor de programación en Python amigable y pedagógico.\n"
@@ -93,7 +96,7 @@ def ejecutar_codigo(req: CodigoRequest):
             )
             try:
                 ai_res = ai_client.models.generate_content(
-                    model="gemini-3.6-flash", contents=prompt
+                    model="gemini-3.8-flash", contents=prompt
                 )
                 explicacion = ai_res.text
             except Exception as ex_ia:
@@ -105,8 +108,10 @@ def ejecutar_codigo(req: CodigoRequest):
             "explicacion_ia": explicacion,
         }
 
+    # 3. CASO: CÓDIGO VÁLIDO PERO SIN IMPRESIÓN (no hizo print)
     if not salida_consola:
-        explicacion = "Tu código no tiene errores de sintaxis, pero no imprimió nada en la consola. Asegúrate de incluir la instrucción print()."
+        explicacion = "Tu código no tiene errores de sintaxis, pero no imprimió nada en la consola. Asegúrate de incluir la instrucción print() dentro de tu código."
+
         if ai_client:
             prompt = (
                 f"El alumno escribió este código en Python:\n```python\n{codigo_limpio}\n```\n\n"
@@ -115,7 +120,7 @@ def ejecutar_codigo(req: CodigoRequest):
             )
             try:
                 ai_res = ai_client.models.generate_content(
-                    model="gemini-3.6-flash", contents=prompt
+                    model="gemini-3.8-flash", contents=prompt
                 )
                 explicacion = ai_res.text
             except Exception as ex_ia:
@@ -127,6 +132,7 @@ def ejecutar_codigo(req: CodigoRequest):
             "explicacion_ia": explicacion,
         }
 
+    # 4. CASO: CÓDIGO CORRECTO CON SALIDA POR PANTALLA
     return {
         "exito": True,
         "salida": salida_consola,
